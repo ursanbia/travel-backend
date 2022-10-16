@@ -17,6 +17,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .password("password")
                 .roles("USER")
                 .and()
+                .withUser("razvan")
+                .password("password")
+                .roles("USER")
+                .and()
                 .withUser("radu")
                 .password("password")
                 .roles("ADMIN");
@@ -27,6 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/restricted").authenticated()
                 .antMatchers("/").anonymous()
+                .anyRequest().authenticated()
                 .and().httpBasic();
     }
 
