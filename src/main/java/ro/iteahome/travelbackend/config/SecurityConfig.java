@@ -1,48 +1,41 @@
 package ro.iteahome.travelbackend.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    @Autowired
-    private MyUserDetailsService userDetailsService;
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("bianca")
-//                .password("password")
-//                .roles("USER")
-//                .and()
-//                .withUser("razvan")
-//                .password("password")
-//                .roles("USER")
-//                .and()
-//                .withUser("radu")
-//                .password("password")
-//                .roles("ADMIN");
-        auth.userDetailsService(userDetailsService);
-    }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/restricted").authenticated()
-                .antMatchers("/").anonymous()
-                .anyRequest().authenticated()
-                .and().httpBasic();
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .httpBasic()
+
+                .and()
+                .authorizeHttpRequests(auth -> auth
+                        .antMatchers("/").permitAll()
+                        .antMatchers("/restricted").authenticated()
+//                        .antMatchers("/client-confirmation").hasRole("CLIENT")
+//                        .antMatchers("/admin-confirmation").hasRole("ADMIN")
+//                        .antMatchers("/clients", "/roles", "/privileges").hasAuthority("CAN_READ")
+                        .antMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated())
+
+                .csrf().disable()                   // Allows the H2 console to open properly
+                .headers().frameOptions().disable() // Allows the H2 console to render properly
+
+                .and()
+                .build();
     }
 
     @Bean
-    public PasswordEncoder getPasswordIncoder(){
-        return NoOpPasswordEncoder.getInstance();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 
