@@ -20,9 +20,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .antMatchers("/").permitAll()
                         .antMatchers("/restricted").authenticated()
-//                        .antMatchers("/client-confirmation").hasRole("CLIENT")
-//                        .antMatchers("/admin-confirmation").hasRole("ADMIN")
-//                        .antMatchers("/clients", "/roles", "/privileges").hasAuthority("CAN_READ")
                         .antMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
 
