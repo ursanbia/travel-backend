@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ro.iteahome.travelbackend.dtos.ClientDTO;
+import ro.iteahome.travelbackend.dtos.mappers.ClientMapper;
 import ro.iteahome.travelbackend.entity.Client;
 import ro.iteahome.travelbackend.repository.ClientRepository;
 
@@ -13,6 +15,8 @@ import ro.iteahome.travelbackend.repository.ClientRepository;
 @Service
 public class ClientService implements UserDetailsService {
 
+    @Autowired
+    private ClientMapper clientMapper;
     @Autowired
     private ClientRepository clientRepository;
 
@@ -31,5 +35,11 @@ public class ClientService implements UserDetailsService {
         return (UserDetails) clientRepository
                 .findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    public ClientDTO add(ClientDTO clientDTO) {
+        Client receivedClient = clientMapper.toClient(clientDTO);
+        Client savedClient = clientRepository.save(receivedClient);
+        return clientMapper.toDTO(savedClient);
     }
 }
